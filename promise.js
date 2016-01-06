@@ -11,15 +11,14 @@
     }
 
     Promise.prototype.then = function(func, context) {
-        var p;
+        var p = new Promise();
         if (this._isdone) {
-            p = func.apply(context, this.result);
+            func.apply(context, this.result);
+            p.done.apply(p, this.result);
         } else {
-            p = new Promise();
             this._callbacks.push(function () {
-                var res = func.apply(context, arguments);
-                if (res && typeof res.then === 'function')
-                    res.then(p.done, p);
+                func.apply(context, arguments);
+                p.done.apply(p, arguments);
             });
         }
         return p;
